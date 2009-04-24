@@ -3,8 +3,8 @@
   \class   TemplateParseXMLOperator templateparsexmloperator.php
   \ingroup eZTemplateOperators
   \brief   Handles template operator parsexml
-  \version 1.0
-  \date    Tuesday 28 December 2004 1:02:09 pm
+  \version 2.0
+  \date    20 April 2009
   \author  Administrator User
 
   By using parsexml you can ...
@@ -15,8 +15,6 @@
 \endcode
 */
 
-include_once( 'lib/ezxml/classes/ezxml.php' );
-
 class TemplateParseXMLOperator
 {
     /*!
@@ -24,7 +22,7 @@ class TemplateParseXMLOperator
     */
     function TemplateParseXMLOperator()
     {
-    	$this->Operators = array( 'parsexml' );
+    	$this->Operators = array( 'parsexml','filecheck' );
     }
 
     /*!
@@ -49,37 +47,49 @@ class TemplateParseXMLOperator
     {
         return array( 'parsexml' => array( 'first_param' => array( 'type' => 'string',
                                                                     'required' => false,
-                                                                    'default' => 'default text' ) ) );
+                                                                    'default' => 'default text' ) ));
     }
     /*!
      Executes the PHP function for the operator cleanup and modifies \a $operatorValue.
     */
-    function modify( &$tpl, &$operatorName, &$operatorParameters, &$rootNamespace, &$currentNamespace, &$operatorValue, &$namedParameters )
+    function modify( $tpl, $operatorName, $operatorParameters, $rootNamespace, $currentNamespace, &$operatorValue, $namedParameters )
     {
         $firstParam = $namedParameters['first_param'];
-
         switch ( $operatorName )
         {
             case 'parsexml':
             {
-                $xmlText = $operatorValue;
-                $fileAttachments=array();
-				if ( trim( $xmlText ) != '' )
-				{
-					$xml = new eZXML();
-					$dom = $xml->domTree( $xmlText );
-					if ($dom)
-					{
-						$root = $dom->root('binaryfile-info');
-						$binaryFile = $root->elementByName( 'binaryfile-attributes' );
-						$FileAttribute = $binaryFile->elementByName(  $firstParam );
-						$FileAttributeValue = $FileAttribute->attributeValue( 'value' );
-					}
-				}
-                $operatorValue=$FileAttributeValue;
+		if ( trim( $operatorValue ) != '' )
+		{
+			$dom = new DOMDocument( '1.0', 'utf-8' );
+			if ($dom->loadXML( $operatorValue ))
+			{	
+				$FileAttributeValue = $dom->getElementsByTagName( $firstParam )->item(0)->textContent;
+				if( !$FileAttributeValue )
+					$FileAttributeValue = $dom->getElementsByTagName( $firstParam )->item(0)->getAttribute('value');
+			}
+			$operatorValue=$FileAttributeValue;
+		}
+            } break;
+            case 'filecheck':
+            {
+		if ( trim( $operatorValue ) != '' )
+		{
+			$dom = new DOMDocument( '1.0', 'utf-8' );
+			if ($dom->loadXML( $operatorValue ))
+			{	
+				$FileAttributeValue = $dom->getElementsByTagName( 'Filename' )->item(0)->textContent;
+				if( !$FileAttributeValue )
+					$FileAttributeValue = $dom->getElementsByTagName( 'Filename' )->item(0)->getAttribute('value');
+			}
+			if(file_exists(eZSys::wwwDir().$FileAttributeValue)){
+				$operatorValue=true;
+			} else {
+				$operatorValue=false;
+			}
+		}
             } break;
         }
     }
 }
 ?>
-

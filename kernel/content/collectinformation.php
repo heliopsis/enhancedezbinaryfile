@@ -3,9 +3,9 @@
 // Created on: <21-Nov-2002 18:27:06 bf>
 //
 // SOFTWARE NAME: eZ Publish
-// SOFTWARE RELEASE: 4.0.1rc1
-// BUILD VERSION: 21995
-// COPYRIGHT NOTICE: Copyright (C) 1999-2008 eZ Systems AS
+// SOFTWARE RELEASE: 4.1.0
+// BUILD VERSION: 23234
+// COPYRIGHT NOTICE: Copyright (C) 1999-2009 eZ Systems AS
 // SOFTWARE LICENSE: GNU General Public License v2.0
 // NOTICE: >
 //   This program is free software; you can redistribute it and/or
@@ -24,15 +24,16 @@
 //
 //
 
-//include_once( 'kernel/classes/ezinformationcollection.php' );
-//include_once( 'kernel/classes/datatypes/ezuser/ezuser.php' );
-//include_once( "lib/ezdb/classes/ezdb.php" );
-//include_once( 'lib/ezutils/classes/ezmail.php' );
-//include_once( 'lib/ezutils/classes/ezmailtransport.php' );
 require_once( 'kernel/common/template.php' );
 
 $Module = $Params['Module'];
 $http = eZHTTPTool::instance();
+$userParameters = array();
+
+if ( isset( $Params['UserParameters'] ) )
+{
+    $userParameters = $Params['UserParameters'];
+}
 
 if ( $Module->isCurrentAction( 'CollectInformation' ) )
 {
@@ -85,6 +86,8 @@ if ( $Module->isCurrentAction( 'CollectInformation' ) )
         $tpl->setVariable( 'collection', $collection );
         $tpl->setVariable( 'node', $node );
         $tpl->setVariable( 'object', $object );
+        $tpl->setVariable( 'viewmode', $ViewMode );
+        $tpl->setVariable( 'view_parameters', $userParameters );
         $tpl->setVariable( 'attribute_hide_list', $attributeHideList );
         $tpl->setVariable( 'error', true );
         $tpl->setVariable( 'error_existing_data', ( $userDataHandling == 'unique' and $collection ) );
@@ -100,12 +103,23 @@ if ( $Module->isCurrentAction( 'CollectInformation' ) )
                               array( 'parent_node', $node->attribute( 'parent_node_id' ) ),
                               array( 'class', $object->attribute( 'contentclass_id' ) ),
                               array( 'class_identifier', $object->attribute( 'class_identifier' ) ),
+                              array( 'viewmode', $ViewMode ),
+                              array( 'remote_id', $object->attribute( 'remote_id' ) ),
+                              array( 'node_remote_id', $node->attribute( 'remote_id' ) ),
                               array( 'navigation_part_identifier', $navigationPartIdentifier ),
                               array( 'depth', $node->attribute( 'depth' ) ),
-                              array( 'url_alias', $node->attribute( 'url_alias' ) )
+                              array( 'url_alias', $node->attribute( 'url_alias' ) ),
+                              array( 'class_group', $object->attribute( 'match_ingroup_id_list' ) ),
+                              array( 'state', $object->attribute( 'state_id_array' ) ),
+                              array( 'state_identifier', $object->attribute( 'state_identifier_array' ) )
                               ) );
 
+        $Result = array();
         $Result['content'] = $tpl->fetch( 'design:content/collectedinfo/' . $informationCollectionTemplate . '.tpl' );
+        $Result['section_id'] = $object->attribute( 'section_id' );
+        $Result['node_id'] = $node->attribute( 'node_id' );
+        $Result['view_parameters'] = $userParameters;
+        $Result['navigation_part'] = $navigationPartIdentifier;
 
         $title = $object->attribute( 'name' );
         if ( $tpl->hasVariable( 'title' ) )
@@ -115,33 +129,23 @@ if ( $Module->isCurrentAction( 'CollectInformation' ) )
         $parents = $node->attribute( 'path' );
 
         $path = array();
-        $titlePath = array();
         foreach ( $parents as $parent )
         {
             $path[] = array( 'text' => $parent->attribute( 'name' ),
                              'url' => '/content/view/full/' . $parent->attribute( 'node_id' ),
                              'url_alias' => $parent->attribute( 'url_alias' ),
-                             'node_id' => $parent->attribute( 'node_id' )
-                             );
+                             'node_id' => $parent->attribute( 'node_id' ) );
         }
+
+        $titlePath = $path;
         $path[] = array( 'text' => $object->attribute( 'name' ),
-                         'url' => '/content/view/full/' . $node->attribute( 'node_id' ),
-                         'url_alias' => $node->attribute( 'url_alias' ),
+                         'url' => false,
+                         'url_alias' => false,
                          'node_id' => $node->attribute( 'node_id' ) );
 
-        array_shift( $parents );
-        foreach ( $parents as $parent )
-        {
-            $titlePath[] = array( 'text' => $parent->attribute( 'name' ),
-                                  'url' => '/content/view/full/' . $parent->attribute( 'node_id' ),
-                                  'url_alias' => $parent->attribute( 'url_alias' ),
-                                  'node_id' => $parent->attribute( 'node_id' )
-                                  );
-        }
         $titlePath[] = array( 'text' => $title,
-                              'url' => '/content/view/full/' . $node->attribute( 'node_id' ),
-                              'url_alias' => $node->attribute( 'url_alias' ),
-                              'node_id' => $node->attribute( 'node_id' ) );
+                              'url' => false,
+                              'url_alias' => false );
 
         $Result['path'] = $path;
         $Result['title_path'] = $titlePath;
@@ -253,15 +257,23 @@ if ( $Module->isCurrentAction( 'CollectInformation' ) )
                                   array( 'parent_node', $node->attribute( 'parent_node_id' ) ),
                                   array( 'class', $object->attribute( 'contentclass_id' ) ),
                                   array( 'class_identifier', $object->attribute( 'class_identifier' ) ),
+                                  array( 'viewmode', $ViewMode ),
+                                  array( 'remote_id', $object->attribute( 'remote_id' ) ),
+                                  array( 'node_remote_id', $node->attribute( 'remote_id' ) ),
                                   array( 'navigation_part_identifier', $navigationPartIdentifier ),
                                   array( 'depth', $node->attribute( 'depth' ) ),
-                                  array( 'url_alias', $node->attribute( 'url_alias' ) )
+                                  array( 'url_alias', $node->attribute( 'url_alias' ) ),
+                                  array( 'class_group', $object->attribute( 'match_ingroup_id_list' ) ),
+                                  array( 'state', $object->attribute( 'state_id_array' ) ),
+                                  array( 'state_identifier', $object->attribute( 'state_identifier_array' ) )
                                   ) );
 
             $tpl->setVariable( 'node_id', $node->attribute( 'node_id' ) );
             $tpl->setVariable( 'collection_id', $collection->attribute( 'id' ) );
             $tpl->setVariable( 'collection', $collection );
             $tpl->setVariable( 'node', $node );
+            $tpl->setVariable( 'viewmode', $ViewMode );
+            $tpl->setVariable( 'view_parameters', $userParameters );
             $tpl->setVariable( 'object', $object );
             $tpl->setVariable( 'attribute_hide_list', $attributeHideList );
 
@@ -278,6 +290,9 @@ if ( $Module->isCurrentAction( 'CollectInformation' ) )
 
             $ini = eZINI::instance();
             $mail = new eZMail();
+
+            if ( $tpl->hasVariable( 'content_type' ) )
+                $mail->setContentType( $tpl->variable( 'content_type' ) );
 
             if ( !$mail->validate( $receiver ) )
             {
@@ -320,60 +335,59 @@ if ( $Module->isCurrentAction( 'CollectInformation' ) )
             }
 
             $mail->setSubject( $subject );
-	    //MAIL ATTACHMENT ADDITION
+//BEGIN ENHANCED BINARY EXTENSION MAIL CODE ADDITION
 		$fileAttachments=array();
 		foreach ( array_keys( $contentObjectAttributes ) as $key ) {
 			if ($contentObjectAttributes[$key]->DataTypeString == "enhancedezbinaryfile" ) {
 				$id=$contentObjectAttributes[$key]->attribute( 'id' );
 				$xmlText = $collectionAttributes[$id]->DataText;
-	
 				if ( trim( $xmlText ) != '' )
-				{
-					$xml = new eZXML();
-					$dom = $xml->domTree( $xmlText );
-					if ($dom)
+				{					
+					$dom = new DOMDocument( '1.0', 'utf-8' );
+					if ($dom->loadXML( $xmlText ))
 					{
-						$root = $dom->root('binaryfile-info');
-						$binaryFile = $root->elementByName( 'binaryfile-attributes' );
-						$OriginalFilename = $binaryFile->elementByName( 'OriginalFilename' );
-						$FileType = $binaryFile->elementByName( 'Type' );
-						$Filename = $binaryFile->elementByName( 'Filename' );
-						$fileAttachments[]=array($Filename->attributeValue( 'value' ),$OriginalFilename->attributeValue( 'value' ),$FileType->attributeValue( 'value' ));
+						$OriginalFilename = $dom->getElementsByTagName( 'OriginalFilename' )->item(0)->textContent;
+						$FileType = $dom->getElementsByTagName( 'Type' )->item(0)->textContent;
+						$Filename = $dom->getElementsByTagName( 'Filename' )->item(0)->textContent;
+						if (file_exists( eZSys::wwwDir().$Filename )) {
+							$fileAttachments[]=array(eZSys::wwwDir().$Filename,$OriginalFilename,$FileType);
+						}
 					}
-				}
+				}	
 			}
 		}
-
-		$mime_boundary = "==Multipart_Boundary_" . md5(time());
-
-		//Plain Text part of Message
-
-		$message = "--{$mime_boundary}\n" .
-		"Content-Type: text/plain; charset=\"".
-		eZTextCodec::internalCharset() . "\"\n" .
-		"Content-Transfer-Encoding: 8bit\n\n"; 
-
-		//Form Result
-		$message .= $templateResult;
-
-		//Attachment(s) part of message
-		foreach ( $fileAttachments as $attacharray) {
-			$filedata = chunk_split(base64_encode(eZFile::getContents($attacharray[0])));
-
-			$message .= "\n\n\n--{$mime_boundary}\n" .
-				"Content-Type: " . $attacharray[2] . "; charset=\"". eZTextCodec::internalCharset() . "\"\n name=\"" . 
-				$attacharray[1] . "\"\n" .
-				"Content-Transfer-Encoding: base64\n" .
-				"Content-Disposition: inline;\n" .
-				" filename=\"" . $attacharray[1] . "\"\n\n" .
-				$filedata . "\n";
+		if (count($fileAttachments) != 0) {
+			$mime_boundary = "==Multipart_Boundary_" . md5(time());
+	
+			//Plain Text part of Message
+	
+			$message = "--{$mime_boundary}\n" .
+			"Content-Type: text/plain; ".
+			eZTextCodec::internalCharset() . "\n" .
+			"Content-Transfer-Encoding: 8bit\n\n";
+	
+			//Form Result
+			$message .= $templateResult;
+	
+			//Attachment(s) part of message
+			foreach ( $fileAttachments as $attacharray) {
+				$filedata = chunk_split(base64_encode(eZFile::getContents($attacharray[0])));
+				$message .= "\n\n\n--{$mime_boundary}\n" .
+					"Content-Type: " . $attacharray[2] . ";\n" .
+					" name=\"" . $attacharray[1] . "\"\n" .
+					"Content-Transfer-Encoding: base64\n" .
+					"Content-Disposition: inline;\n" .
+					" filename=\"" . $attacharray[1] . "\"\n\n" .
+					$filedata . "\n";
+	
+			}
+			$message .= "--{$mime_boundary}--\n\n\n";
+	
+			$templateResult = $message;
+			$mail->setContentType( "multipart/mixed;boundary=$mime_boundary",false,false,false );
 		}
-		$message .= "--{$mime_boundary}--\n\n\n";
+//END ENHANCED BINARY EXTENSION MAIL CODE ADDITION
 
-		$templateResult = $message;
-		$mail->setContentType( "multipart/mixed;boundary=$mime_boundary",false,false,false );
-
-	    //END MAIL ATTACHMENT ADDITION
             $mail->setBody( $templateResult );
             $mailResult = eZMailTransport::send( $mail );
         }

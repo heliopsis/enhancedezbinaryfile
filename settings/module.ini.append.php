@@ -59,7 +59,7 @@ FullPathGroups[]=12
 #Editors
 FullPathGroups[]=13
 #All Users
-#FullPathGroups[]=4
+FullPathGroups[]=4
 
 # However, It is perhaps desirable for the person who gets the collected info
 # mail to always get the link.  Assuming the collect.ini SendEmail is enabled.

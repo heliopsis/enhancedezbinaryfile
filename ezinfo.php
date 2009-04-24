@@ -43,7 +43,7 @@ class enhancedezbinaryfileInfo
     {
         return array(
             'Name' => "enhancedezbinaryfile",
-            'Version' => "1.0",
+            'Version' => "1.1",
             'Copyright' => "Copyright (c) 2008 Contactivity B.V.",
             'Info_url' => "http://www.contactivity.com",
             'License' => "GNU General Public License v2.0"

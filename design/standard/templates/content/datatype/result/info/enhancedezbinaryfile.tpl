@@ -21,13 +21,14 @@
 		{/foreach}
 	{/if}
 {$attribute.data_text|parsexml("OriginalFilename")|wash} {'succesfully uploaded.'|i18n( 'design/standard/content/datatype' )}
-
 	{if $inGroup}
-		{if $mail} {*text*}
-			{* This goes to the collectedinfo admin mail if enabled*}
+		{if eq($attribute.data_text|filecheck,true)}
+			{if $mail} {*text*}
+				{* This goes to the collectedinfo admin mail if enabled*}
 http://{ezini( "SiteSettings", "SiteURL" )}{$attribute.data_text|parsexml("Filename")|wash|ezroot(no)}
-		{else} {*html*}
-			<br>{'Link'|i18n( 'design/standard/content/datatype' )}: <a href={$attribute.data_text|parsexml('Filename')|ezroot}>{$attribute.data_text|parsexml("OriginalFilename")}</a> 
+			{else} {*html*}
+					<br>{'Link'|i18n( 'design/standard/content/datatype' )}: <a href={$attribute.data_text|parsexml('Filename')|ezroot}>{$attribute.data_text|parsexml("OriginalFilename")}</a>
+			{/if}
 		{/if}
 	{/if}
 {else}

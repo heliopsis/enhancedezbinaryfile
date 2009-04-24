@@ -3,7 +3,7 @@
 // Definition of EnhancedeZBinaryFileType class
 //
 // SOFTWARE NAME: eZ Publish
-// SOFTWARE RELEASE: 4.0.1rc1
+// SOFTWARE RELEASE: 4.1.0
 // BUILD VERSION: 21995
 // COPYRIGHT NOTICE: Copyright (C) 1999-2008 eZ Systems AS
 // SOFTWARE LICENSE: GNU General Public License v2.0
@@ -452,16 +452,16 @@ class EnhancedeZBinaryFileType extends eZDataType
             }
 
 	//Adds xmltext to collection attribute with file info to data_text attribute
-	$doc = new eZDOMDocument( 'FileInfo' );
-	$root = $doc->createElementNode( 'binaryfile-info' );
-	$binaryFileList = $doc->createElementNode( 'binaryfile-attributes' );
+	$doc = new DOMDocument( '1.0', 'utf-8' );
+        $root = $doc->createElement( 'binaryfile-info' );
+	$binaryFileList = $doc->createElement( 'binaryfile-attributes' );
 	foreach ( $binaryFile as $key => $binaryFileItem )
 	{
-		$binaryFileElement[$key] = $doc->createElementNode( $key, array( 'value' => $binaryFileItem ) );
-		$binaryFileList->appendChild( $binaryFileElement[$key] );
+		$binaryFileElement = $doc->createElement(  $key, $binaryFileItem );
+		$binaryFileList->appendChild( $binaryFileElement );
 	}
 	$root->appendChild( $binaryFileList );
-	$doc->setRoot( $root );
+	$doc->appendChild( $root );
 	$docText = EnhancedeZBinaryFileType::domString( $doc );
 	$collectionAttribute->setAttribute( 'data_text', $docText );
         }
@@ -567,7 +567,7 @@ class EnhancedeZBinaryFileType extends eZDataType
        -3 (eZHTTPFile::UPLOADEDFILE_EXCEEDS_MAX_SIZE) if the file was uploaded but size
           exceeds $maxSize or MAX_FILE_SIZE variable in the form.
     */
-    static function canFetch( $http_name, $maxSize = false )
+    function canFetch( $http_name, $maxSize = false )
     {
        if ( isset( $GLOBALS["eZHTTPFile-$http_name"] ) AND
            $GLOBALS["eZHTTPFile-$http_name"] instanceof eZHTTPFile  )
@@ -636,7 +636,7 @@ class EnhancedeZBinaryFileType extends eZDataType
         {
             $charset = eZCharsetInfo::realCharsetCode( $charset );
         }
-        $domString = $domDocument->toString( $charset );
+        $domString = $domDocument->saveXML();
         return $domString;
     }
 
