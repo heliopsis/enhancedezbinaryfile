@@ -3,5 +3,8 @@
 [TemplateSettings]
 ExtensionAutoloadPath[]=enhancedezbinaryfile
 
+[RegionalSettings]
+TranslationExtensions[]=enhancedezbinaryfile
+
 */ ?>
 

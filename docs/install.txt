@@ -51,6 +51,11 @@ Installation instructions:
   //BEGIN ENHANCED BINARY EXTENSION MAIL CODE ADDITION
   and
   //END ENHANCED BINARY EXTENSION MAIL CODE ADDITION
+  It should go between the lines:
+
+            $mail->setSubject( $subject );
+->HERE
+            $mail->setBody( $templateResult );
 
   It is possible to send mail to multiple recipients by adding:
   $bcc=<address>

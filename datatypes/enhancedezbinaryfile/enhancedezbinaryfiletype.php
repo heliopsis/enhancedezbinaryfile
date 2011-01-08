@@ -3,9 +3,9 @@
 // Definition of EnhancedeZBinaryFileType class
 //
 // SOFTWARE NAME: eZ Publish
-// SOFTWARE RELEASE: 4.1.0
+// SOFTWARE RELEASE: 4.4.0
 // BUILD VERSION: 21995
-// COPYRIGHT NOTICE: Copyright (C) 1999-2008 eZ Systems AS
+// COPYRIGHT NOTICE: Copyright (C) 1999-2010 Contactivity.com
 // SOFTWARE LICENSE: GNU General Public License v2.0
 // NOTICE: >
 //   This program is free software; you can redistribute it and/or
@@ -36,12 +36,21 @@ class EnhancedeZBinaryFileType extends eZDataType
     const MAX_FILESIZE_FIELD = 'data_int1';
     const MAX_FILESIZE_VARIABLE = '_enhancedezbinaryfile_max_filesize_';
     const DATA_TYPE_STRING = "enhancedezbinaryfile";
+    
+    /*!
+     Construction of the class, note that the second parameter in eZDataType 
+     is the actual name showed in the datatype dropdown list.
+    */
+    function __construct()
+    {
+        parent::__construct( self::DATA_TYPE_STRING, ezi18n( 'extension/enhancedezbinaryfile/datatype', 'Enhanced File', 'Datatype name' ), array( 'serialize_supported' => true, 'object_serialize_map' => array( 'data_text' => 'filename' )));
+    }
 
     function EnhancedeZBinaryFileType()
     {
         $this->eZDataType( self::DATA_TYPE_STRING, ezi18n( 'kernel/classes/datatypes', "Enhanced File", 'Datatype name' ),
-                           array( 'serialize_supported' => true,
-                           'object_serialize_map' => array( 'data_text' => 'filename' )) );
+                           array( 'serialize_supported' => true,'object_serialize_map' => array( 'data_text' => 'filename' )
+                            ));
     }
 
     /*!
