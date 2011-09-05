@@ -54,40 +54,40 @@ class TemplateParseXMLOperator
     */
     function modify( $tpl, $operatorName, $operatorParameters, $rootNamespace, $currentNamespace, &$operatorValue, $namedParameters )
     {
-        $firstParam = $namedParameters['first_param'];
         switch ( $operatorName )
         {
             case 'parsexml':
             {
-		if ( trim( $operatorValue ) != '' )
-		{
-			$dom = new DOMDocument( '1.0', 'utf-8' );
-			if ($dom->loadXML( $operatorValue ))
-			{	
-				$FileAttributeValue = $dom->getElementsByTagName( $firstParam )->item(0)->textContent;
-				if( !$FileAttributeValue )
-					$FileAttributeValue = $dom->getElementsByTagName( $firstParam )->item(0)->getAttribute('value');
-			}
-			$operatorValue=$FileAttributeValue;
-		}
+                $firstParam = $namedParameters['first_param'];
+                if ( trim( $operatorValue ) != '' )
+        		{
+        			$dom = new DOMDocument( '1.0', 'utf-8' );
+        			if ($dom->loadXML( $operatorValue ))
+        			{
+        				$FileAttributeValue = $dom->getElementsByTagName( $firstParam )->item(0)->textContent;
+        				if( !$FileAttributeValue )
+        					$FileAttributeValue = $dom->getElementsByTagName( $firstParam )->item(0)->getAttribute('value');
+        			}
+        			$operatorValue=$FileAttributeValue;
+        		}
             } break;
             case 'filecheck':
             {
-		if ( trim( $operatorValue ) != '' )
-		{
-			$dom = new DOMDocument( '1.0', 'utf-8' );
-			if ($dom->loadXML( $operatorValue ))
-			{	
-				$FileAttributeValue = $dom->getElementsByTagName( 'Filename' )->item(0)->textContent;
-				if( !$FileAttributeValue )
-					$FileAttributeValue = $dom->getElementsByTagName( 'Filename' )->item(0)->getAttribute('value');
-			}
-			if(file_exists(eZSys::wwwDir().$FileAttributeValue)){
-				$operatorValue=true;
-			} else {
-				$operatorValue=false;
-			}
-		}
+        		if ( trim( $operatorValue ) != '' )
+        		{
+        			$dom = new DOMDocument( '1.0', 'utf-8' );
+        			if ($dom->loadXML( $operatorValue ))
+        			{
+        				$FileAttributeValue = $dom->getElementsByTagName( 'Filename' )->item(0)->textContent;
+        				if( !$FileAttributeValue )
+        					$FileAttributeValue = $dom->getElementsByTagName( 'Filename' )->item(0)->getAttribute('value');
+        			}
+        			if(file_exists(eZSys::wwwDir().$FileAttributeValue)){
+        				$operatorValue=true;
+        			} else {
+        				$operatorValue=false;
+        			}
+        		}
             } break;
         }
     }
