@@ -36,19 +36,19 @@ class EnhancedeZBinaryFileType extends eZDataType
     const MAX_FILESIZE_FIELD = 'data_int1';
     const MAX_FILESIZE_VARIABLE = '_enhancedezbinaryfile_max_filesize_';
     const DATA_TYPE_STRING = "enhancedezbinaryfile";
-    
+
     /*!
-     Construction of the class, note that the second parameter in eZDataType 
+     Construction of the class, note that the second parameter in eZDataType
      is the actual name showed in the datatype dropdown list.
     */
     function __construct()
     {
-        parent::__construct( self::DATA_TYPE_STRING, ezi18n( 'extension/enhancedezbinaryfile/datatype', 'Enhanced File', 'Datatype name' ), array( 'serialize_supported' => true, 'object_serialize_map' => array( 'data_text' => 'filename' )));
+        parent::__construct( self::DATA_TYPE_STRING, ezpI18n::tr( 'extension/enhancedezbinaryfile/datatype', 'Enhanced File', 'Datatype name' ), array( 'serialize_supported' => true, 'object_serialize_map' => array( 'data_text' => 'filename' )));
     }
 
     function EnhancedeZBinaryFileType()
     {
-        $this->eZDataType( self::DATA_TYPE_STRING, ezi18n( 'kernel/classes/datatypes', "Enhanced File", 'Datatype name' ),
+        $this->eZDataType( self::DATA_TYPE_STRING, ezpI18n::tr( 'kernel/classes/datatypes', "Enhanced File", 'Datatype name' ),
                            array( 'serialize_supported' => true,'object_serialize_map' => array( 'data_text' => 'filename' )
                             ));
     }
@@ -203,7 +203,7 @@ class EnhancedeZBinaryFileType extends eZDataType
             {
                 eZAppendWarningItem( array( 'error' => array( 'type' => 'kernel',
                                                               'number' => eZError::KERNEL_NOT_AVAILABLE ),
-                                            'text' => ezi18n( 'kernel/classes/datatypes',
+                                            'text' => ezpI18n::tr( 'kernel/classes/datatypes',
                                                               'File uploading is not enabled. Please contact the site administrator to enable it.' ) ) );
                 $GLOBALS['eZBinaryFileTypeWarningAdded'] = true;
             }
@@ -397,10 +397,10 @@ class EnhancedeZBinaryFileType extends eZDataType
 	$extension = preg_replace('/.*\.(.+?)$/', '\\1', $binaryFile->attribute( "original_filename" ) );
 	if (!in_array(strtolower($extension),$allowed))
 	{
-		$contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes','Failed to store file. Only the following file types are allowed: %1.' ), implode(", ",$allowed) );
+		$contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes','Failed to store file. Only the following file types are allowed: %1.' ), implode(", ",$allowed) );
 		return eZInputValidator::STATE_INVALID;
 	}
- 
+
         //$contentObjectAttribute->setContent( $binaryFile );
 
         if ( $binaryFile instanceof eZHTTPFile )
@@ -522,16 +522,16 @@ class EnhancedeZBinaryFileType extends eZDataType
 	$extension = preg_replace('/.*\.(.+?)$/', '\\1', $binaryFile->attribute( "original_filename" ) );
 	if (!in_array(strtolower($extension),$allowed))
 	{
-		$contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes','Failed to store file. Only the following file types are allowed: %1.' ), implode(", ",$allowed) );
+		$contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes','Failed to store file. Only the following file types are allowed: %1.' ), implode(", ",$allowed) );
 		return eZInputValidator::STATE_INVALID;
 	}
 
-	//Check size 
+	//Check size
 	$mustUpload = false;
         $maxSize = 1024 * 1024 * $classAttribute->attribute( self::MAX_FILESIZE_FIELD );
 
 /* Since it is not an ezbinary file this can never be true
-   unfortunately, this is where the check would be to not upload the file 
+   unfortunately, this is where the check would be to not upload the file
    multiple times in the event the form fails somewhere.  Unfortunately it
    can't be a binary file since it is a collection object and not a content
    object.
@@ -550,17 +550,17 @@ class EnhancedeZBinaryFileType extends eZDataType
 	//$binaryfile doesn't have an attribute(http_name)
         if ( $mustUpload && $canFetchResult === eZHTTPFile::UPLOADEDFILE_DOES_NOT_EXIST )
         {
-            $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes', 'A valid file is required.' ) );
+            $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'A valid file is required.' ) );
             return eZInputValidator::STATE_INVALID;
         }
         if ( $canFetchResult == eZHTTPFile::UPLOADEDFILE_EXCEEDS_PHP_LIMIT )
         {
-            $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes', 'The size of the uploaded file exceeds the limit set by the upload_max_filesize directive in php.ini.' ) );
+            $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'The size of the uploaded file exceeds the limit set by the upload_max_filesize directive in php.ini.' ) );
             return eZInputValidator::STATE_INVALID;
         }
         if ( $canFetchResult == eZHTTPFile::UPLOADEDFILE_EXCEEDS_MAX_SIZE )
         {
-            $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes', 'The size of the uploaded file exceeds the maximum upload size: %1 bytes.' ), $maxSize );
+            $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'The size of the uploaded file exceeds the maximum upload size: %1 bytes.' ), $maxSize );
             return eZInputValidator::STATE_INVALID;
         }
 	//Dropped all the way through with no error
