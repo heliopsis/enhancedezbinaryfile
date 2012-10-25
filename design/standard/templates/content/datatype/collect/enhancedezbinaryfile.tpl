@@ -11,5 +11,5 @@
 <input type="hidden" name="MAX_FILE_SIZE" value="{$attribute.contentclass_attribute.data_int1}000000"/>
 <input class="box" name="{$attribute_base}_data_enhancedbinaryfilename_{$attribute.id}" type="file" />
 </div>
-
+</div>
 {/default}
