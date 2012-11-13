@@ -493,7 +493,7 @@ class EnhancedeZBinaryFileType extends eZDataType
 	{
 		if ( $contentObjectAttribute->validateIsRequired() )
 		{
-			$contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes','Input required.' ) );
+			$contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes','Input required.' ) );
 			return eZInputValidator::STATE_INVALID;
 		}
 		else
