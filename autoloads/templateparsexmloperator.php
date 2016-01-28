@@ -1,4 +1,4 @@
-<?
+<?php
 /*!
   \class   TemplateParseXMLOperator templateparsexmloperator.php
   \ingroup eZTemplateOperators
